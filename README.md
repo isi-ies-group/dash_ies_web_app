@@ -1,6 +1,6 @@
-# Dash Natural Gas Well Production
+# IES WebApp
 
-This is a demo of the Dash interactive Python framework developed by [Plotly](https://plot.ly/).
+Based on Dash interactive Python framework developed by [Plotly](https://plot.ly/).
 
 Dash abstracts away all of the technologies and protocols required to build an interactive web-based application and is a simple and effective way to bind a user interface around your Python code. To learn more check out our [documentation](https://plot.ly/dash).
 
@@ -40,21 +40,10 @@ python app.py
 
 ## About the app
 
-This Dash app displays oil production in western New York. There are filters at the top of the app to update the graphs below. By selecting or hovering over data in one plot will update the other plots ('cross-filtering').
+This Dash app displays meteo data collected by IES-UPM.
 
 ## Built With
 
 - [Dash](https://dash.plot.ly/) - Main server and interactive components
 - [Plotly Python](https://plot.ly/python/) - Used to create the interactive plots
 
-## Screenshots
-
-The following are screenshots for the app in this repo:
-
-![animated1](screenshots/animated1.gif)
-
-![screenshot](screenshots/screenshot1.png)
-
-![screenshot](screenshots/screenshot2.png)
-
-![screenshot](screenshots/screenshot3.png)
