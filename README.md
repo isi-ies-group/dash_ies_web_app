@@ -47,3 +47,6 @@ This Dash app displays meteo data collected by IES-UPM.
 - [Dash](https://dash.plot.ly/) - Main server and interactive components
 - [Plotly Python](https://plot.ly/python/) - Used to create the interactive plots
 
+## Requirements
+- This is a demo. The requirements.txt file attached is used for debugging purposes only.
+
