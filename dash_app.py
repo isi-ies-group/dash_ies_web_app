@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Apr 15 20:18:04 2020
+
+@author: GuillermoMatas
+"""
 
 import dash
 import dash_html_components as html
@@ -6,23 +12,49 @@ import dash_bootstrap_components as dbc
 import dash_table
 from dash.dependencies import Input, Output, State
 
+from flask import request
 
 from controls import MAGNITUDE_LABELS, MAGNITUDE_SYMBOLS
 from controls import UNITS, VAR_CATEGORIES, DATATABLE_OPTION, HELP_BTN
 
+import pandas as pd
 from datetime import timedelta
+import datetime as dt
 import time
+from concurrent.futures import ThreadPoolExecutor
 
 import urllib.parse as urllib
+import logging
 
 import db_functions
 import aux_functions
 
 app = dash.Dash(__name__)
 
+app.title = 'IES-UPM Dashboard'
+
 server = app.server
 app.config.suppress_callback_exceptions = True
 
+PATH_DATOS = 'C:/Users/Helios/Documents/'
+PATH_DATOS_FICHERO_METEO = PATH_DATOS + 'meteo.parquet'
+
+logging.basicConfig(
+    filename=PATH_DATOS + 'dash-app.log',
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S')
+
+logger = logging.getLogger(__name__)
+
+logger.info('Nueva sesión')
+
+console = logging.StreamHandler()
+console.setLevel(logging.INFO)
+
+df = pd.read_parquet(PATH_DATOS_FICHERO_METEO)
+df = df.rename(columns={'G(0)':'g_0', 'G(41)':'g_41', 'D(0)':'d_0', 'B':'b', 'Wvel':'w_vel', 'Wdir':'w_dir', 'Tamb':'helios_t_amb'}).rename(columns=str.lower)
+df = df.asfreq('1H')
 
 def description_card():
     """
@@ -46,7 +78,9 @@ def generate_control_card():
     """
     :return: A Div containing controls for graphs.
     """
-    date_interval = db_functions.getTimeIntervalDB()
+    global df
+    
+    date_interval = db_functions.getTimeIntervalDB(df)
 
     return html.Div(
         id="control-card",
@@ -58,7 +92,7 @@ def generate_control_card():
                 id="date-picker-select",
                 className="dateRangePickerInput",
                 display_format="YYYY-MM-DD",
-                start_date=date_interval[0],
+                start_date=date_interval[1]-timedelta(days=7),
                 end_date=date_interval[1],
                 min_date_allowed=date_interval[0],
                 max_date_allowed=date_interval[1]+timedelta(days=1),  # #Este día no se incluye
@@ -119,10 +153,8 @@ def generate_control_card():
         ],
     )
 
-
-
-
-app.layout = html.Div(
+def serve_layout():
+    return html.Div(
     id="app-container",
     children=[
         # Banner
@@ -147,6 +179,7 @@ app.layout = html.Div(
         dcc.Loading(
             id="loading-right-column",
             type="graph",
+            
         ),
         html.Div(
                 id="auto-generated-datatable",
@@ -154,8 +187,7 @@ app.layout = html.Div(
         
         
         html.Hr(),
-    ],
-)
+    ])
 
 @app.callback(
     Output("auto-generated-graphics", "children"),
@@ -173,12 +205,16 @@ def generate_graphics(start_date, end_date, selected_var):
     
         :return: children Graphics.
     """
-    df = db_functions.createDataFrameFromQuery(selected_var, [start_date, end_date])
+    logger.info(request.remote_addr)
+
+    global df
+    
+    df_datos = db_functions.createDataFrameFromQuery(df, selected_var, [start_date, end_date])
     graph_cat = aux_functions.getGraphCategories(selected_var)
     
     fig_vector = []
     for category in graph_cat:
-        fig_vector.append(aux_functions.createGraph(df, selected_var, category, [start_date, end_date]))
+        fig_vector.append(aux_functions.createGraph(df_datos, selected_var, category, [start_date, end_date]))
 
     graph_components = []
     graph_count=1
@@ -187,7 +223,8 @@ def generate_graphics(start_date, end_date, selected_var):
                                             id="cat-graph-"+str(graph_count),
                                             figure=fig
                                         )
-                               )
+                                )
+        
         for i in range(3):
             graph_components.append(html.Br())
 
@@ -213,18 +250,20 @@ def generate_datatable(start_date, end_date, selected_var, datatable_option):
     
         :return: children Graphics.
     """
+    global df
+
     if datatable_option == "none":
         return []
 
     else:
         if datatable_option == "full_data":
             selected_var=list(MAGNITUDE_SYMBOLS.keys())
-            df = db_functions.createDataFrameFromQuery(selected_var, [start_date, end_date])
+            df_datos = db_functions.createDataFrameFromQuery(df, selected_var, [start_date, end_date])
         else:
-            df = db_functions.createDataFrameFromQuery(selected_var, [start_date, end_date])
+            df_datos = db_functions.createDataFrameFromQuery(df, selected_var, [start_date, end_date])
             
         # #Relleno de los valores nulos
-        df.fillna('NaN', inplace=True)
+        df_datos.fillna('NaN', inplace=True)
         return html.Div(dash_table.DataTable(
                     id='db_table',
                     style_cell={
@@ -255,9 +294,8 @@ def generate_datatable(start_date, end_date, selected_var, datatable_option):
                     selected_columns=[],
                     selected_rows=[],
                     page_action="native",
-                    columns=[{"name": MAGNITUDE_LABELS[i] + UNITS[i], "id": i} for i in df.columns],
-                    data=df.to_dict('records'),
-                    
+                    columns=[{"name": MAGNITUDE_LABELS[i] + UNITS[i], "id": i} for i in df_datos.columns],
+                    data=df_datos.to_dict('records'),
                 ),
             )
 
@@ -272,12 +310,14 @@ def update_download_link(start_date, end_date, dwn_click):
     # Find which one has been triggered
     ctx = dash.callback_context
 
+    global df
+
     if ctx.triggered:
         selected_var=list(MAGNITUDE_SYMBOLS.keys())
-        df = db_functions.createDataFrameFromQuery(selected_var, [start_date, end_date])
+        df_datos = db_functions.createDataFrameFromQuery(df, selected_var, [start_date, end_date])
         # #Relleno de los valores nulos
-        df.fillna('NaN', inplace=True)
-        csv_string = df.to_csv(sep='\t', index=False, encoding='utf-8')
+        df_datos.fillna('NaN', inplace=True)
+        csv_string = df_datos.to_csv(sep='\t', index=False, encoding='utf-8')
         csv_string = "data:text/csv;charset=utf-8," + urllib.quote(csv_string, encoding='utf-8')
         return csv_string
 
@@ -312,7 +352,25 @@ def input_triggers_spinner(start_date, end_date, selected_var, table_option):
             html.Br(),
             ]
 
+# https://community.plotly.com/t/solved-updating-server-side-app-data-on-a-schedule/6612/15
+def refresh_data_every():
+    while True:
+        if dt.datetime.now().time().hour == 8:
+            refresh_data()
+            logger.info('DF recargado')
+        time.sleep(3600) # reload interval in seconds (1h)
 
+def refresh_data():
+    global df
+    ### some expensive computation function to update dataframe
+    df = pd.read_parquet(PATH_DATOS_FICHERO_METEO)
+    df = df.rename(columns={'G(0)':'g_0', 'G(41)':'g_41', 'D(0)':'d_0', 'B':'b', 'Wvel':'w_vel', 'Wdir':'w_dir', 'Tamb':'helios_t_amb'}).rename(columns=str.lower)
+    df = df.asfreq('1H')
+
+executor = ThreadPoolExecutor(max_workers=1)
+executor.submit(refresh_data_every)
+
+app.layout = serve_layout
 
 if __name__ == '__main__':
     app.run_server(port=4050)

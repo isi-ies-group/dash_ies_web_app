@@ -54,7 +54,7 @@ def createGraph(df, selected_var, category, dates):
                     
                     # #Creación de un dataframe que contiene los datos 
                     # #de velocidad de viento asociado a su dirección
-                    aux_df=db_functions.createDataFrameFromQuery([wind_speed_var],dates)
+                    aux_df=db_functions.createDataFrameFromQuery(df, [wind_speed_var],dates)
                     graph_df[wind_speed_var]=aux_df[wind_speed_var].copy()
                     graph_df[wind_dir_var]=df[wind_dir_var].copy()
         
@@ -92,7 +92,7 @@ def createGraph(df, selected_var, category, dates):
     else:
         for y_trace in graph_var:
             
-            fig.add_trace(go.Scatter(x=df['measure_utc_dt'], 
+            fig.add_trace(go.Scatter(x=df.index, 
                                      y=df[y_trace],
                                      name=MAGNITUDE_SYMBOLS[y_trace],
                                      mode='lines'
