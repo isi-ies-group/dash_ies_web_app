@@ -23,8 +23,9 @@ MAGNITUDE_SYMBOLS = {
     "cal_top": "Cal Top (W/m^2)",
     "cal_mid": "Cal Mid (W/m^2)",
     "cal_bot": "Cal Bot (W/m^2)",
-    "pres_aire": "Air Pressure (mBar)"
-
+    "pres_aire": "Air Pressure (mBar)",
+    "hr": "Relative Humidity (%)", # param nuevo
+    "lluvia": "Precipitation (mm)", # param nuevo
 }
 
 MAGNITUDE_LABELS = {
@@ -51,8 +52,9 @@ MAGNITUDE_LABELS = {
     "cal_top": "Cal Top",
     "cal_mid": "Cal Mid",
     "cal_bot": "Cal Bot",
-    "pres_aire": "Air Pressure"
-
+    "pres_aire": "Air Pressure",
+    "hr": "Relative Humidity",
+    "lluvia": "Precipitation",
 }
 
 
@@ -80,8 +82,9 @@ UNITS = {
     "cal_top": "(W/m^2)",
     "cal_mid": "(W/m^2)",
     "cal_bot": "(W/m^2)",
-    "pres_aire": "(mBar)"
-
+    "pres_aire": "(mBar)",
+    "hr": "(%)",
+    "lluvia": "(mm)",
 }
 
 VAR_CATEGORIES = {
@@ -93,8 +96,9 @@ VAR_CATEGORIES = {
     "sun angle": ["ele_sol", "ori_sol"],
     "pressure": ["pres_aire"],
     "wind speed": ["w_vel", "v_viento"],
-    "wind direction": ["w_dir", "d_viento"]
-
+    "wind direction": ["w_dir", "d_viento"],
+    "relative humidity": ["hr"],
+    "precipitation": ["lluvia"],
 }
 
 DATATABLE_OPTION = {
