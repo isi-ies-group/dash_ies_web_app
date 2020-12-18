@@ -120,7 +120,7 @@ def createHelpPopover(identifier_key, img_src):
         dbc.Popover(
             [
                 dbc.PopoverHeader(HELP_BTN[identifier_key]['header']),
-                dbc.PopoverBody(HELP_BTN[identifier_key]['body']),
+                dbc.PopoverBody(HELP_BTN[identifier_key]['body'], style={'whiteSpace': 'pre-wrap'}),
             ],
             id="popover-{}".format(identifier_key),
             is_open=False,

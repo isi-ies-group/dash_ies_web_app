@@ -3,7 +3,6 @@
 # In[]:
 # Controls for webapp
 MAGNITUDE_SYMBOLS = {
-
     "g_0": "G(0) (W/m^2)",
     "g_41": "G(41) (W/m^2)",
     "d_0": "D(0) (W/m^2)",
@@ -20,16 +19,15 @@ MAGNITUDE_SYMBOLS = {
     "top": "Top (W/m^2)",
     "mid": "Mid (W/m^2)",
     "bot": "Bot (W/m^2)",
-    "cal_top": "Cal Top (W/m^2)",
-    "cal_mid": "Cal Mid (W/m^2)",
-    "cal_bot": "Cal Bot (W/m^2)",
+    # "cal_top": "Cal Top (W/m^2)",
+    # "cal_mid": "Cal Mid (W/m^2)",
+    # "cal_bot": "Cal Bot (W/m^2)",
     "pres_aire": "Air Pressure (mBar)",
     "hr": "Relative Humidity (%)", # param nuevo
     "lluvia": "Precipitation (mm)", # param nuevo
 }
 
 MAGNITUDE_LABELS = {
-
     "measure_utc_time": "UTC Time",
     "measure_date": "Date",
     "measure_utc_dt": 'UTC DateTime',
@@ -59,7 +57,6 @@ MAGNITUDE_LABELS = {
 
 
 UNITS = {
-
     "measure_utc_time": "(HH:MM)",
     "measure_date": "(yyyy-mm-dd)",
     "measure_utc_dt": "(HH:MM, yyyy-mm-dd)",
@@ -88,7 +85,6 @@ UNITS = {
 }
 
 VAR_CATEGORIES = {
-
     "date_time": ["measure_utc_time", "measure_date", "measure_utc_dt"],
     "irradiance": ["g_0", "g_41", "d_0", "b", "rad_dir", "top", "mid", "bot",
                    "cal_top", "cal_mid", "cal_bot"],
@@ -102,19 +98,36 @@ VAR_CATEGORIES = {
 }
 
 DATATABLE_OPTION = {
-
     "none": "None",
     "plot_data": "Displayed data",
     "full_data": "Full Dataset"
+}
 
+SENSORS_DESCRIPTION = {
+    "Global Horizontal Irradiance": "Eppley - PSP",
+    "Global Tilted Irradiance": "Eppley - PSP",
+    "Diffuse Horizontal Irradiance": "Eppley - PSP",
+    "Direct Normal Irradiance - 1": "Eppley - NIP",
+    "Wind Speed - 1": "GILL - Windsonic",
+    "Wind Direction - 1": "GILL - Windsonic",
+    "Air Temperature - 1": "Young -YSI44031",
+    "Wind Speed - 2": "GILL - Windsonic",
+    "Wind Direction - 2": "GILL - Windsonic",
+    "Air Temperature - 2": "Geonica - STH-S331",
+    "Direct Normal Irradiance - 2": "Kipp & Zonen - CHP1",
+    "Top": "SAV - ICU-3J25 Spectroheliometer",
+    "Mid": "SAV - ICU-3J25 Spectroheliometer",
+    "Bot": "SAV - ICU-3J25 Spectroheliometer",
+    "Air Pressure": "Young - 61302L",
+    "Relative Humidity": "Geonica - STH-S331",
+    "Precipitation": "Pronamic - DK-8600",
 }
 
 HELP_BTN = {
     # identifier: {header: header_text, body: body_text}
-
-    'date': {'header': 'header_date', 'body': 'body_date'},
-    'graph_var': {'header': 'header_graph', 'body': 'body_graph'},
-    'datatable': {'header': 'header_table', 'body': 'body_table'},
+    'date': {'header': 'Select Time interval', 'body': 'This option allows the user to choose the date range to be displayed'},
+    'graph_var': {'header': 'Select Variable\n to Plot', 'body': 'This option allows the user to choose the variables to plot:\n'+''.join(f'* {k} ({v})\n' for k,v in SENSORS_DESCRIPTION.items())},
+    'datatable': {'header': 'Select DataTable visibility options', 'body': 'This option allows the user to choose among "None", "Displayed data" and "Full Dataset"'},
     'download': {'header': "Download Full Dataset", 'body': 'This option allows the user to download a CSV file containing all the variables data between the selected dates.'}
-
 }
+
