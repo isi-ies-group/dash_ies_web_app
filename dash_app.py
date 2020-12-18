@@ -52,9 +52,19 @@ logger.info('Nueva sesión')
 console = logging.StreamHandler()
 console.setLevel(logging.INFO)
 
-df = pd.read_parquet(PATH_DATOS_FICHERO_METEO)
-df = df.rename(columns={'G(0)':'g_0', 'G(41)':'g_41', 'D(0)':'d_0', 'B':'b', 'Wvel':'w_vel', 'Wdir':'w_dir', 'Tamb':'helios_t_amb'}).rename(columns=str.lower)
-df = df.asfreq('1H')
+def carga_df_parquet():
+    df_fichero = pd.read_parquet(PATH_DATOS_FICHERO_METEO)
+    renombra_meteo = {'G(0)':'g_0', 'G(41)':'g_41', 'D(0)':'d_0', 'B':'b', 'Wvel':'w_vel', 'Wdir':'w_dir', 'Tamb':'helios_t_amb', 'Elev.Sol':'ele_sol', 'Orient.Sol':'ori_sol'}
+    df_fichero = df_fichero.rename(columns=renombra_meteo).rename(columns=str.lower)
+    # df_fichero = df_fichero.asfreq('1H')
+    cols_mean = ['temp_air', 'rad_dir', 'g_0', 'd_0', 'top', 'mid', 'bot', 'cal_top', 'cal_mid', 'cal_bot', 'pres_aire', 'v_viento', 'd_viento', 'ele_sol', 'ori_sol', 'helios_t_amb', 'hr', 'b', 'g_41', 'gn', 'pirgeo', 'temp_pirgeo', 'w_vel', 'w_dir', ]
+    cols_sum = ['lluvia', 'limpieza']
+    df_mean = df_fichero[cols_mean].resample('1H').agg('mean')
+    df_sum = df_fichero[cols_sum].resample('1H').agg('sum')
+    
+    return pd.concat([df_mean, df_sum], axis='columns')
+
+df = carga_df_parquet()
 
 def description_card():
     """
@@ -363,9 +373,7 @@ def refresh_data_every():
 def refresh_data():
     global df
     ### some expensive computation function to update dataframe
-    df = pd.read_parquet(PATH_DATOS_FICHERO_METEO)
-    df = df.rename(columns={'G(0)':'g_0', 'G(41)':'g_41', 'D(0)':'d_0', 'B':'b', 'Wvel':'w_vel', 'Wdir':'w_dir', 'Tamb':'helios_t_amb'}).rename(columns=str.lower)
-    df = df.asfreq('1H')
+    df = carga_df_parquet()
 
 executor = ThreadPoolExecutor(max_workers=1)
 executor.submit(refresh_data_every)
