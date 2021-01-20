@@ -95,7 +95,7 @@ def generate_header():
                             'height': '30px', 'width': '30px'}), html.P("List of meteorological sensors", style={'display': 'inline-block'})
                     ], href=app.get_asset_url('list_sensors.html'), target="_blank")),
                     html.P(
-                    "The dataset contains data since 2011 with a resolution of one minute and is updated daily with the measurements of the previous day."),
+                    "The dataset contains data since 2011 with a resolution of one hour and is updated daily with the measurements of the previous day."),
                     html.Br()
                 ], style={'display': 'inline-block', 'margin-left': '10px'}),
 
