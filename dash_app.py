@@ -29,6 +29,8 @@ import logging
 import db_functions
 import aux_functions
 
+DEBUG_MODE = True
+
 app = dash.Dash(__name__)
 
 app.title = 'IES-UPM Meteo Data Repository'
@@ -74,6 +76,32 @@ def carga_df_parquet():
 df = carga_df_parquet()
 
 
+def generate_header():
+    return html.Div(
+        id="intro service",
+        className="right column",
+        children=[
+            html.Div(html.Img(src=app.get_asset_url("tracker_kippzonen.png"), style={
+                'height': '200px'}), style={'display': 'inline-block'}),
+            html.Div(html.Img(src=app.get_asset_url("tracker_geonica.png"), style={
+                'height': '200px'}), style={'display': 'inline-block'}),
+            html.Div(
+                [html.P(html.A([
+                    html.Img(src=app.get_asset_url("where_icon.png"), style={
+                        'height': '30px', 'width': '30px'}), html.P("Madrid (Spain) 40.45N 3.72W, 695 m", style={'display': 'inline-block'})
+                ], href='https://www.openstreetmap.org/#map=19/40.45328/-3.72698', target="_blank")),
+                    html.P(html.A([
+                        html.Img(src=app.get_asset_url("station_icon.png"), style={
+                            'height': '30px', 'width': '30px'}), html.P("List of meteorological sensors", style={'display': 'inline-block'})
+                    ], href=app.get_asset_url('list_sensors.html'), target="_blank")),
+                    html.P(
+                    "The dataset contains data since 2011 with a resolution of one minute and is updated daily with the measurements of the previous day."),
+                    html.Br()
+                ], style={'display': 'inline-block', 'margin-left': '10px'}),
+
+        ])
+
+
 def generate_control_card():
     """
     :return: A Div containing controls for graphs.
@@ -86,7 +114,7 @@ def generate_control_card():
         id="control-card",
         children=[
             html.Div(id="intro-web",
-                     children="Select the dates and the variables to be displayed.",
+                     children="Select the dates and the variables to be displayed:",
                      ),
             html.P("Select Time interval",  style={'display': 'inline-block'}),
             aux_functions.createHelpPopover(
@@ -163,6 +191,7 @@ def generate_control_card():
         ],
     )
 
+
 def generate_disclaimer():
     return html.Div([
         html.Small("Any publication based in whole or in part on these data sets should conspicuously acknowledge the data source as IES-UPM meteo station."),
@@ -171,7 +200,7 @@ def generate_disclaimer():
         html.Br(),
         html.Br(),
         html.Small("© 2021 All rights reserved. Universidad Politécnica de Madrid"),
-        ], style={'text-align': 'justify'})
+    ], style={'text-align': 'justify'})
 
 
 def serve_layout():
@@ -187,32 +216,14 @@ def serve_layout():
             ),
             # Intro
             html.H2("IES-UPM Meteo Data Repository", className="right column"),
-            html.Div(
-                id="intro service",
-                className="right column",
-                children=[
-                    html.Div(html.Img(src=app.get_asset_url("tracker_kippzonen.png"), style={'height': '200px'}), style={'display': 'inline-block'}),
-                    html.Div(html.Img(src=app.get_asset_url("tracker_geonica.png"), style={'height': '200px'}), style={'display': 'inline-block'}),
-                    html.Div(
-                        [html.P(html.A([
-                                html.Img(src=app.get_asset_url("where_icon.png"), style={
-                                    'height': '30px', 'width': '30px'}), html.P("Madrid (Spain) 40.45N 3.72W, 695 m", style={'display': 'inline-block'})
-                            ], href='https://www.openstreetmap.org/#map=19/40.45328/-3.72698', target="_blank")),
-                        html.P(html.A([
-                                html.Img(src=app.get_asset_url("station_icon.png"), style={
-                                    'height': '30px', 'width': '30px'}), html.P("List of meteorological sensors", style={'display': 'inline-block'})
-                            ], href=app.get_asset_url('list_sensors.html'), target="_blank")),
-                        html.P("The dataset contains data since 2011 with a resolution of one minute and is updated daily with the measurements of the previous day."),
-                        html.Br()
-                        ], style={'display': 'inline-block', 'margin-left':'10px'}),
-                    
-                ],
-            ),
+            generate_header(),
             # Left column
             html.Div(
                 id="left-column",
                 className="three columns",
-                children=[generate_control_card(), html.Br(), generate_disclaimer()]
+                children=[generate_control_card(),
+                          html.Br(),
+                          generate_disclaimer()]
                 + [
                     html.Div(
                         ["initial child"], id="output-clientside", style={"display": "none"}
@@ -223,20 +234,14 @@ def serve_layout():
             dcc.Loading(
                 id="loading-right-column",
                 type="graph",
-
             ),
             html.Div(
                 id="auto-generated-datatable",
                 className="eleven columns",),
-
-            
-            # html.Hr(),
-            # Banner
-            # html.H1("INSTITUTO DE ENERGÍA SOLAR"),
         ])
 
 
-@ app.callback(
+@app.callback(
     Output("auto-generated-graphics", "children"),
     [
         Input("date-picker-select", "start_date"),
@@ -258,17 +263,17 @@ def generate_graphics(start_date, end_date, selected_var):
 
     global df
 
-    df_datos=db_functions.createDataFrameFromQuery(
+    df_datos = db_functions.createDataFrameFromQuery(
         df, selected_var, [start_date, end_date])
-    graph_cat=aux_functions.getGraphCategories(selected_var)
+    graph_cat = aux_functions.getGraphCategories(selected_var)
 
-    fig_vector=[]
+    fig_vector = []
     for category in graph_cat:
         fig_vector.append(aux_functions.createGraph(
             df_datos, selected_var, category, [start_date, end_date]))
 
-    graph_components=[]
-    graph_count=1
+    graph_components = []
+    graph_count = 1
     for fig in fig_vector:
         graph_components.append(dcc.Graph(
             id="cat-graph-"+str(graph_count),
@@ -412,23 +417,25 @@ def input_triggers_spinner(start_date, end_date, selected_var, table_option):
     ]
 
 # https://community.plotly.com/t/solved-updating-server-side-app-data-on-a-schedule/6612/15
-# def refresh_data_every():
-#     while True:
-#         if dt.datetime.now().time().hour == 8:
-#             refresh_data()
-#             logger.info('DF recargado')
-#         time.sleep(3600) # reload interval in seconds (1h)
 
-# def refresh_data():
-#     global df
-#     ### some expensive computation function to update dataframe
-#     df = carga_df_parquet()
 
-# executor = ThreadPoolExecutor(max_workers=1)
-# executor.submit(refresh_data_every)
+if not DEBUG_MODE:
+    def refresh_data_every():
+        while True:
+            if dt.datetime.now().time().hour == 8:
+                refresh_data()
+                logger.info('DF recargado')
+            time.sleep(3600)  # reload interval in seconds (1h)
 
+    def refresh_data():
+        global df
+        # some expensive computation function to update dataframe
+        df = carga_df_parquet()
+
+    executor = ThreadPoolExecutor(max_workers=1)
+    executor.submit(refresh_data_every)
 
 app.layout = serve_layout
 
 if __name__ == '__main__':
-    app.run_server(debug=True, use_reloader=True)
+    app.run_server(debug=DEBUG_MODE)
