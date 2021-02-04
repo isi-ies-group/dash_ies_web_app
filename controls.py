@@ -103,30 +103,10 @@ DATATABLE_OPTION = {
     "full_data": "Full Dataset"
 }
 
-SENSORS_DESCRIPTION = {
-    "Global Horizontal Irradiance": "Eppley - PSP",
-    "Global Tilted Irradiance": "Eppley - PSP",
-    "Diffuse Horizontal Irradiance": "Eppley - PSP",
-    "Direct Normal Irradiance - 1": "Eppley - NIP",
-    "Wind Speed - 1": "GILL - Windsonic",
-    "Wind Direction - 1": "GILL - Windsonic",
-    "Air Temperature - 1": "Young -YSI44031",
-    "Wind Speed - 2": "GILL - Windsonic",
-    "Wind Direction - 2": "GILL - Windsonic",
-    "Air Temperature - 2": "Geonica - STH-S331",
-    "Direct Normal Irradiance - 2": "Kipp & Zonen - CHP1",
-    "Top": "SAV - ICU-3J25 Spectroheliometer",
-    "Mid": "SAV - ICU-3J25 Spectroheliometer",
-    "Bot": "SAV - ICU-3J25 Spectroheliometer",
-    "Air Pressure": "Young - 61302L",
-    "Relative Humidity": "Geonica - STH-S331",
-    "Precipitation": "Pronamic - DK-8600",
-}
-
 HELP_BTN = {
     # identifier: {header: header_text, body: body_text}
     'date': {'header': 'Select Time interval', 'body': 'This option allows the user to choose the date range to be displayed'},
-    'graph_var': {'header': 'Select Variable\n to Plot', 'body': 'This option allows the user to choose the variables to plot:\n'+''.join(f'* {k} ({v})\n' for k,v in SENSORS_DESCRIPTION.items())},
+    'graph_var': {'header': 'Select Variable\n to Plot', 'body': 'This option allows the user to choose the variables to plot:\n'+''.join(f'* {v}\n' for k,v in MAGNITUDE_LABELS.items() if "measure_" not in k)},
     'datatable': {'header': 'Select DataTable visibility options', 'body': 'This option allows the user to choose among "None", "Displayed data" and "Full Dataset"'},
     'download': {'header': "Download Full Dataset", 'body': 'This option allows the user to download a CSV file containing all the variables data between the selected dates.'}
 }
