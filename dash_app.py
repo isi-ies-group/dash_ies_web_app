@@ -438,4 +438,4 @@ if not DEBUG_MODE:
 app.layout = serve_layout
 
 if __name__ == '__main__':
-    app.run_server(debug=DEBUG_MODE)
+    app.run_server(port=80, host='0.0.0.0', debug=DEBUG_MODE)
