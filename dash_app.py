@@ -22,6 +22,7 @@ from datetime import timedelta
 import datetime as dt
 import time
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 
 import urllib.parse as urllib
 import logging
@@ -29,7 +30,7 @@ import logging
 import db_functions
 import aux_functions
 
-DEBUG_MODE = True
+DEBUG_MODE = False
 
 app = dash.Dash(__name__)
 
@@ -38,8 +39,7 @@ app.title = 'IES-UPM Meteo Data Repository'
 server = app.server
 app.config.suppress_callback_exceptions = True
 
-# PATH_DATOS = 'C:/Users/Helios/Documents/'
-PATH_DATOS = 'C:/Users/Ruben/Documents/'
+PATH_DATOS = 'C:/Users/Helios/Documents/'
 
 PATH_DATOS_FICHERO_METEO = PATH_DATOS + 'meteo.parquet'
 
@@ -195,11 +195,23 @@ def generate_control_card():
 def generate_disclaimer():
     return html.Div([
         html.Small("Any publication based in whole or in part on these data sets should conspicuously acknowledge the data source as IES-UPM meteo station."),
+        html.Br(),
+        html.Br(),
         html.Hr(),
+        html.Br(),
         html.Small("Disclaimer: Data have not been reviewed for accuracy or completeness. IES-UPM's  goal is to keep this information timely and accurate. If errors are brought to our attention, we will try to correct them. However, IES-UPM accepts no responsibility or liability whatsoever with regard to the information on this site."),
         html.Br(),
         html.Br(),
         html.Small("© 2021 All rights reserved. Universidad Politécnica de Madrid"),
+        html.Hr(),
+        html.Small(
+            html.Center(
+                html.A(
+                    "info@ies.upm.es",
+                    href="mailto:info@ies.upm.es?Subject=IES-UPM meteo station",
+                    ),
+                ),
+        ),
     ], style={'text-align': 'justify'})
 
 
@@ -438,4 +450,4 @@ if not DEBUG_MODE:
 app.layout = serve_layout
 
 if __name__ == '__main__':
-    app.run_server(port=80, host='0.0.0.0', debug=DEBUG_MODE)
+    app.run_server(debug=DEBUG_MODE, port=8050, host='0.0.0.0')
