@@ -37,4 +37,4 @@ pandas == 1.0.1
 plotly == 4.5.4
 
 # app-deploy.py: 6
-waitress == 1.4.3
+waitress == 2.1.1
