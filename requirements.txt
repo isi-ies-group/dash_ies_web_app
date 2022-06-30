@@ -26,7 +26,7 @@ dash_table == 4.6.1
 
 # aux_functions.py: 22
 # db_functions.py: 10
-numpy == 1.21.0
+numpy == 1.22.0
 
 # aux_functions.py: 23
 # db_functions.py: 9
