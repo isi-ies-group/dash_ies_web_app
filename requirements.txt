@@ -18,7 +18,7 @@ dash_core_components == 2.0.0
 
 # aux_functions.py: 9
 # dash_app.py: 3
-dash_html_components == 1.0.2
+dash_html_components == 2.0.0
 
 # aux_functions.py: 12
 # dash_app.py: 6
